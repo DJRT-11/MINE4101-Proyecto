@@ -1,7 +1,6 @@
 import pandas as pd
 import geopandas as gpd
 import numpy as np
-import geoplot.crs as gcrs
 
 import folium
 from folium import Choropleth
@@ -9,7 +8,7 @@ from folium import Choropleth
 from flask import Flask, render_template
 from flask import request, jsonify, current_app, json
 
-import logging
+import loggings
 
 data_new_codes = pd.read_csv("./data/NEW_CODES.csv",sep=";")
 
