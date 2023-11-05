@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Análisis de Datos Electorales</title>
+    <style>
+        .options-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: left;
+            width: 710px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Style for the dropdown list */
+        .dropdown {
+            position: absolute;
+            left: 10px; /* Adjust the left position as needed */
+        }
+
+        /* Additional styling for the dropdown list */
+        .dropdown select {
+            width: 200px;
+            padding: 5px;
+        }
+        /* Style for the map container */
+        .map-container {
+            width: 710px;
+            height: 860px;
+            overflow: hidden;
+            position: relative; 
+        }
+
+        /* Style to crop Map 1 by specific pixels on both sides */
+        .map1-container {
+            position: absolute; /* Position it absolutely inside the container */
+            top: 0;
+            left: 0;
+            width: 100%; /* Adjust the width to compensate for cropping */
+            height: 100%; /* Reduce the height of Map 1 */
+            z-index: 1; /* Ensure Map 1 is displayed below Map 2 */
+        }
+
+        /* Style to display Map 2 */
+        .map2-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 120px; /* Map 2 takes up half of the available width */
+            height: 20%; /* Map 2 takes up the full height */
+            z-index: 2; /* Ensure Map 2 is displayed on top of Map 1 */
+        }
+
+        .map3-container {
+            position: absolute;
+            top: 0;
+            left: 120px;
+            width: 120px; /* Map 2 takes up half of the available width */
+            height: 20%; /* Map 2 takes up the full height */
+            z-index: 2; /* Ensure Map 2 is displayed on top of Map 1 */
+        }
+
+        /* Optional: Add padding or margin to the maps if needed */
+        .map1, .map2, .map3 {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Style for the menu */
+        .menu1 {
+            position: absolute;
+            display: none; /* Initially hidden */
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 35%;
+            z-index: 3; /* Display above maps */
+            /* Additional styling for the menu */
+        }
+
+        .menu2 {
+            position: absolute;
+            display: none; /* Initially hidden */
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 35%;
+            z-index: 3; /* Display above maps */
+            /* Additional styling for the menu */
+        }
+
+        /* Add styling for the tables in menu2 */
+        .tabcontent table, .menu1 table {
+            width: 100%; /* Make the table fill the container */
+            border-collapse: collapse; /* Collapse borders */
+        }
+
+        .tabcontent table th, .tabcontent table td, .menu1 table th, .menu1 table td {
+            border: 1px solid #ccc; /* Add borders to table cells */
+            padding: 8px; /* Add padding to cells for spacing */
+            text-align: left; /* Align text to the left */
+        }
+
+        .tabcontent table th, .menu1 table th {
+            background-color: #7EB2DD; /* Header background color */
+            font-weight: bold; /* Bold header text */
+        }
+
+        /* Define fixed column widths for the tables */
+        .tabcontent table th:nth-child(1),
+        .tabcontent table td:nth-child(1),
+        .menu1 table th:nth-child(1),
+        .menu1 table td:nth-child(1) {
+            width: 30%; /* Adjust the width as needed for the first column */
+        }
+
+        .tabcontent table th:nth-child(2),
+        .tabcontent table td:nth-child(2),
+        .menu1 table td:nth-child(2),
+        .menu1 table td:nth-child(2) {
+            width: 30%; /* Adjust the width as needed for the second column */
+        }
+
+        .tabcontent table th:nth-child(3),
+        .tabcontent table td:nth-child(3) {
+            width: 40%; /* Adjust the width as needed for the third column */
+        }
+
+        .tablinks {
+            background-color: #c4c4c4;
+            color: black;
+            cursor: pointer;
+        }
+
+        .tablinks.active-tab {
+            background-color: #3d3d3d;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>DISPOC-C</h1>
+    <h3>Dashboard Interactivo SocioPolitico para Organización de Campañas - Colombia</h3>
+
+    <!-- Dropdown list -->
+    <div class="options-container"> 
+        <div class="dropdown">
+            <label for="variable">Elija una escala:</label>
+            <select id="variable">
+                <option value="poblacion">Población</option>
+                <option value="total_votos">Total de votos</option>
+                <!-- Add more options as needed -->
+            </select>
+        </div>
+ 
+        <button id="refresh-button">Refresh</button>
+
+    </div>
+
+    <div class="map-container">
+        <!-- Map 1 Container (Rendered First) -->
+        <div class="map1-container">
+            <div id="map1" class="map1">{{ map1|safe }}</div>
+        </div>
+
+        <!-- Map 2 Container (Rendered Second) -->
+        <div class="map2-container">
+            <div id="map2" class="map2">{{ map2|safe }}</div>
+        </div>
+
+        <!-- Map 3 Container (Rendered Last) -->
+        <div class="map3-container">
+            <div id="map3" class="map3">{{ map3|safe }}</div>
+        </div>
+    </div>
+
+    <!-- Menu Container -->
+    <div id="menu1" class="menu1">
+        <h2>Datos electorales:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Campo</th>
+                    <th>Valor</th>
+                    <!--<th>Total de votos</th>
+                    <th>Porcentaje de votos</th>-->
+                    <!-- Add more table headers as needed -->
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="menu2" class="menu2">
+        <h2>Datos demográficos:</h2>
+
+        <!--Declaring the tabs-->
+        <div class="tabs">
+            <button class="tablinks" data-tab="tab1">Edu. Básica</button>
+            <button class="tablinks" data-tab="tab2">Edu. Superior</button>
+            <button class="tablinks" data-tab="tab3">Etnia</button>
+            <button class="tablinks" data-tab="tab4">Alfabetización</button>
+        </div>
+
+        <!--Defining tab content-->
+        <div id="tab1" class="tabcontent" style="display: block;">
+            <canvas id="charttab1"></canvas>
+        </div>
+
+        <div id="tab2" class="tabcontent">
+            <canvas id="charttab2"></canvas>
+        </div>
+
+        <div id="tab3" class="tabcontent">
+            <canvas id="charttab3"></canvas>
+        </div>
+
+        <div id="tab4" class="tabcontent">
+            <canvas id="charttab4"></canvas>
+        </div>      
+    </div>
+
+    <!-- JavaScript/jQuery Script -->
+    <script>
+        $(document).ready(function() {
+            var menu1 = $('#menu1');
+            var menu2 = $('#menu2');
+            var map1 = $('#map1');
+            var map2 = $('#map2');
+            var map3 = $('#map3');
+
+            var activeTab = "tab1";
+            var data_dpto;
+            var polygonID;
+
+            console.log("mapa y datos cargados")
+
+            // Function to open a clicked tab 
+            function openTab(evt, tabName){
+                activeTab = tabName;
+                var i, tabcontent, tablinks;
+                
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for(i=0; i<tabcontent.length; i++){
+                    tabcontent[i].style.display = "none";
+                }
+
+                document.getElementById(tabName).style.display = "block";
+                updateChartData(tabName)
+
+                $('.tablinks').removeClass('active-tab');
+                // Add the 'active-tab' class to the current tablink
+                $(this).addClass('active-tab');
+            }
+
+            function updateChartData(tabName){
+                var dpto = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
+                
+                if(dpto) {
+                    console.log(dpto.DPTO_CNMBR)
+
+                    var chartData = {
+                        labels: [],
+                        datasets: [{
+                            label: "",
+                            data: [],
+                            backgroundColor: "rgba(0,123,134,0.5)",
+                            borderColor: "rgba(0,123,134,1)",
+                            borderWidth: 2,
+                        }]
+                    };
+
+                    if(tabName == "tab1") {
+                        chartData.labels = [
+                            "Preescolar",
+                            "Primaria",
+                            "Secundaria",
+                            "Media",
+                            "Normal",
+                            "Sin información"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "Completo/a",
+                                data: [
+                                    dpto.ED_Preescolar_Norm * 100,
+                                    dpto.ED_Primaria_Completa_Norm * 100,
+                                    dpto.ED_Secundaria_Completa_Norm * 100,
+                                    dpto.ED_Media_Completa_Norm * 100,
+                                    dpto.ED_Normal_Completa_Norm * 100,
+                                    0
+                                ],
+                                backgroundColor: "rgba(75,192,192,0.5)",
+                                borderColor: "rgba(75,192,192,1)",
+                                borderWidth: 2,
+                            },
+                            {
+                                label: "Incompleto/a",
+                                data: [
+                                    0,
+                                    dpto.ED_Primaria_Incompleta_Norm * 100,
+                                    dpto.ED_Secundaria_Incompleta_Norm * 100,
+                                    dpto.ED_Media_Incompleta_Norm * 100,
+                                    dpto.ED_Normal_Incompleta_Norm * 100,
+                                    dpto.ED_SININF_Norm * 100
+                                ],
+                                backgroundColor: "rgba(255,99,132,0.5)",
+                                borderColor: "rgba(255,99,132,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+                    else if(tabName == "tab2") {
+                        chartData.labels = [
+                            "Técnico",
+                            "Tecnológico",
+                            "Pregrado",
+                            "Posgrado",
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "% Completo",
+                                data: [
+                                    dpto.ED_Tecnico_Norm * 100,
+                                    dpto.ED_Tecnologico_Norm * 100,
+                                    dpto.ED_Universitario_Norm * 100,
+                                    dpto.ED_Postgrado_Norm * 100,
+                                ],
+                                backgroundColor: "rgba(75,192,192,0.5)",
+                                borderColor: "rgba(75,192,192,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+                    else if(tabName == "tab3") {
+                        chartData.labels = [
+                            "Indígena",
+                            "Gitano/a o Rrom",
+                            "Raizal",
+                            "Palenquero(a)",
+                            "Afrodescendiente",
+                            "Ningún grupo étnico",
+                            "Sin información"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "% Reportado",
+                                data: [
+                                    dpto.ET_Indigena_Norm * 100,
+                                    dpto.ET_Gitano_Norm * 100,
+                                    dpto.ET_Raizal_Norm * 100,
+                                    dpto.ET_Palenquero_Norm * 100,
+                                    dpto.ET_Negro_Norm * 100,
+                                    dpto.ET_NOETNIA_Norm * 100,
+                                    dpto.ET_SININF_Norm * 100,
+                                ],
+                                backgroundColor: "rgba(75,192,192,0.5)",
+                                borderColor: "rgba(75,192,192,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+                    else if(tabName == "tab4") {
+                        chartData.labels = [
+                            "Sabe leer",
+                            "No sabe leer",
+                            "Sin información"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "% Reportado",
+                                data: [
+                                    dpto.ALF_Sabe_Leer_Norm * 100,
+                                    dpto.ALF_No_Sabe_Leer_Norm * 100,
+                                    dpto.ALF_SININF_Norm * 100
+                                ],
+                                backgroundColor: "rgba(75,192,192,0.5)",
+                                borderColor: "rgba(75,192,192,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+
+                    var chartID = "chart" + tabName;
+                    var chartElement = document.getElementById(chartID).getContext('2d');
+
+                    if(chartElement) {
+                        if (window.myChart){
+                            window.myChart.destroy();
+                            console.log("old chart destroyed");
+                        }
+
+                        window.myChart = new Chart(chartElement, {
+                            type: "bar",
+                            data: chartData,
+                            options: {
+                                indexAxis: 'y',
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            }
+                        });
+                        console.log("new chart created");   
+                    }          
+                }
+            }
+
+            $('#refresh-button').click(function() {
+                // Get the selected option from the dropdown
+                var selectedOption = $('#variable').val();
+
+                // Send an AJAX request to Flask
+                $.ajax({
+                    type: 'POST',
+                    url: '/update_choropleth',
+                    data: {
+                        selected_option: selectedOption
+                    },
+                    success: function(data) {
+                        // Update the map container with the new map HTML
+                        $('#map-container').html(data.updated_map_html);
+                    }
+                });
+            });
+
+            // Add a click event handler for polygons in 
+            $.getJSON('/dpto_data_map', function(data) {
+                data_dpto = data.data_dpto;
+            
+                map1.on('click', '.leaflet-interactive', function(e) {
+                
+                    // Show the menus to the right of map1
+                    menu1.css({
+                        'display': 'block',                
+                        'top': 150 + 'px',
+                        'left': 800 + 'px'
+                    });
+
+                    menu2.css({
+                        'display': 'block',                
+                        'top': 550 + 'px',
+                        'left': 800 + 'px' // Adjust as needed
+                    });
+
+                    polygonID = e.target._leaflet_id;
+
+                    // Find the corresponding row in the DataFrame
+                    openTab(e,"tab1")
+                    $('.tablinks[data-tab="tab1"]').addClass('active-tab'); // Apply "active-tab" style to tab1
+                    var department = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
+
+                    if(department){
+                    
+                        var tbody1 = menu1.find('tbody');
+
+                        tbody1.empty();
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Nombre:     "))
+                            .append($('<td>').text(department.DPTO_CNMBR))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Población:      "))
+                            .append($('<td>').text(department.STP27_PERS))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos:     "))
+                            .append($('<td>').text(department.Total_votos))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos en blanco:     "))
+                            .append($('<td>').text(department.votos_en_blanco))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos no marcados:     "))
+                            .append($('<td>').text(department.votos_no_marcados))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos nulos:     "))
+                            .append($('<td>').text(department.votos_nulos))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Partido ganador:     "))
+                            .append($('<td>').text(department.Partido_1))
+                        );
+                    };
+                });
+
+                map2.on('click', '.leaflet-interactive', function(e) {
+                    console.log('Polygon clicked!');
+                
+                
+                    menu1.css({
+                        'display': 'block',                
+                        'top': 150 + 'px',
+                        'left': 800 + 'px'
+                    });
+
+                    menu2.css({
+                        'display': 'block',                
+                        'top': 550 + 'px',
+                        'left': 800 + 'px' // Adjust as needed
+                    });
+
+                    polygonID = e.target._leaflet_id;
+                    console.log(polygonID);
+
+                    // Find the corresponding row in the DataFrame
+                    openTab(e,"tab1")
+                    $('.tablinks[data-tab="tab1"]').addClass('active-tab'); // Apply "active-tab" style to tab1
+                    var department = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
+
+                    if(department){
+                    
+                        var tbody1 = menu1.find('tbody');
+
+                        tbody1.empty();
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Nombre:     "))
+                            .append($('<td>').text(department.DPTO_CNMBR))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Población:      "))
+                            .append($('<td>').text(department.STP27_PERS))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos:     "))
+                            .append($('<td>').text(department.Total_votos))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos en blanco:     "))
+                            .append($('<td>').text(department.votos_en_blanco))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos no marcados:     "))
+                            .append($('<td>').text(department.votos_no_marcados))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos nulos:     "))
+                            .append($('<td>').text(department.votos_nulos))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Partido ganador:     "))
+                            .append($('<td>').text(department.Partido_1))
+                        );
+                    };
+                });
+                
+                
+                map3.on('click', '.leaflet-interactive', function(e) {
+                    console.log('Polygon clicked!');
+                
+                    // Show the menu to the right of map1
+                
+                    menu1.css({
+                        'display': 'block',                
+                        'top': 150 + 'px',
+                        'left': 800 + 'px' // Adjust as needed
+                    });
+
+                    menu2.css({
+                        'display': 'block',                
+                        'top': 550 + 'px',
+                        'left': 800 + 'px' // Adjust as needed
+                    });
+
+                    polygonID = e.target._leaflet_id;
+                    console.log(polygonID);
+
+                    // Find the corresponding row in the DataFrame
+                    openTab(e,"tab1")
+                    $('.tablinks[data-tab="tab1"]').addClass('active-tab'); // Apply "active-tab" style to tab1
+                    var department = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
+
+                    if(department){
+                    
+                        var tbody1 = menu1.find('tbody');
+
+                        tbody1.empty();
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Nombre:     "))
+                            .append($('<td>').text(department.DPTO_CNMBR))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Población:      "))
+                            .append($('<td>').text(department.STP27_PERS))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos:     "))
+                            .append($('<td>').text(department.Total_votos))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos en blanco:     "))
+                            .append($('<td>').text(department.votos_en_blanco))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos no marcados:     "))
+                            .append($('<td>').text(department.votos_no_marcados))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Total de votos nulos:     "))
+                            .append($('<td>').text(department.votos_nulos))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Partido ganador:     "))
+                            .append($('<td>').text(department.Partido_1))
+                        );
+                    };
+                });
+            });
+
+            $(".tablinks").on("click", function(event){
+                var tabName = $(this).attr("data-tab");
+                openTab(event,tabName);
+                updateChartData(tabName);
+                // Remove the 'active-tab' class from all tablinks
+                $('.tablinks').removeClass('active-tab');
+                // Add the 'active-tab' class to the current tablink
+                $(this).addClass('active-tab');
+            });
+        });
+    </script>
+</body>
+</html>
