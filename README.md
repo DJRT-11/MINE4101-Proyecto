@@ -28,5 +28,5 @@
 - Entre a la dirección 127.0.0.1:5000 en su explorador
 
 ## Documentos
-- *.PDF: reporte del proyecto que puede ser visualizado en su explorador o lector local.
+- PROYECTO_INGENIAL_SEGUNDA_ENTREGA.PDF: reporte del proyecto que puede ser visualizado en su explorador o lector local.
 - ModelsTraining.ipynb: notebook de Jupyter que detalla el proceso de entrenamiento de modelos potenciales de ML para nuestra pregunta.
