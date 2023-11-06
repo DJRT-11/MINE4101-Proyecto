@@ -8,7 +8,7 @@ from folium import Choropleth
 from flask import Flask, render_template
 from flask import request, jsonify, current_app, json
 
-import loggings
+import logging
 
 data_new_codes = pd.read_csv("./data/NEW_CODES.csv",sep=";")
 
