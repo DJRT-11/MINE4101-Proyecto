@@ -5,6 +5,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Análisis de Datos Electorales</title>
     <style>
+        body {
+            background-color: #dddddd !important;
+            font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+        }
+
+        h1 {
+            color: #EA8B00;
+            font-size: 24px;
+            font-weight: 900 !important;
+            text-align: center;
+            font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+        }
+
+        h3 {
+            color: #EA8B00;
+            font-size: 16px;
+            font-weight: 400 !important;
+            text-align: left;
+            font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+        }
+
         .options-container {
             display: flex;
             justify-content: space-between;
@@ -70,25 +91,41 @@
 
         /* Style for the menu */
         .menu1 {
+            font-family: Verdana, Geneva, Tahoma, sans-serif !important;
             position: absolute;
             display: none; /* Initially hidden */
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #dddddd;
             border: 1px solid #ccc;
             padding: 10px;
-            width: 35%;
+            width: 385px;
             z-index: 3; /* Display above maps */
             /* Additional styling for the menu */
         }
 
         .menu2 {
+            font-family: Verdana, Geneva, Tahoma, sans-serif !important;
             position: absolute;
             display: none; /* Initially hidden */
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #dddddd;
+            font-weight: bold !important;
+            border: 2px solid #ccc;
+            padding: 10px;
+            overflow: hidden;
+            box-sizing: border-box;
+            width: 1055px;
+            height: 435px !important;
+            z-index: 3; /* Display above maps */
+            /* Additional styling for the menu */
+        }
+
+        .menu3 {
+            font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+            position: absolute;
+            display: none; /* Initially hidden */
+            background-color: #dddddd;
             border: 1px solid #ccc;
             padding: 10px;
-            width: 35%;
+            width: 655px;
             z-index: 3; /* Display above maps */
             /* Additional styling for the menu */
         }
@@ -101,13 +138,15 @@
 
         .tabcontent table th, .tabcontent table td, .menu1 table th, .menu1 table td {
             border: 1px solid #ccc; /* Add borders to table cells */
+            background-color: #fcdfb5;
             padding: 8px; /* Add padding to cells for spacing */
             text-align: left; /* Align text to the left */
         }
 
         .tabcontent table th, .menu1 table th {
-            background-color: #7EB2DD; /* Header background color */
+            background-color: #FF9900; /* Header background color */
             font-weight: bold; /* Bold header text */
+            color: white;
         }
 
         /* Define fixed column widths for the tables */
@@ -130,6 +169,13 @@
             width: 40%; /* Adjust the width as needed for the third column */
         }
 
+        /* Set a maximum height for the graph container or the graph itself */
+        .tabcontent canvas {
+            background-color: #dddddd;
+            max-height: 300px !important; /* Adjust the maximum height as needed */
+            width: 90%; /* Ensure the graph takes the full width of the container */
+        }
+
         .tablinks {
             background-color: #c4c4c4;
             color: black;
@@ -137,30 +183,29 @@
         }
 
         .tablinks.active-tab {
-            background-color: #3d3d3d;
+            background-color: #FF9900;
             color: white;
             font-weight: bold;
         }
+
+        #popup-container {
+            display: none; /* Initially hidden */
+            position: absolute;
+        }
+
+        #popup {
+            background-color: #FF9900;
+            color: white;
+            padding: 10px 20px !important;
+            font-size: 20px !important;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
-    <h1>DISPOC-C</h1>
-    <h3>Dashboard Interactivo SocioPolitico para Organización de Campañas - Colombia</h3>
-
-    <!-- Dropdown list -->
-    <div class="options-container"> 
-        <div class="dropdown">
-            <label for="variable">Elija una escala:</label>
-            <select id="variable">
-                <option value="poblacion">Población</option>
-                <option value="total_votos">Total de votos</option>
-                <!-- Add more options as needed -->
-            </select>
-        </div>
- 
-        <button id="refresh-button">Refresh</button>
-
-    </div>
+    <h1>DIES</h1>
+    <h3>Dashboard Interactivo Electoral y Sociodemográfico</h3>
 
     <div class="map-container">
         <!-- Map 1 Container (Rendered First) -->
@@ -187,9 +232,6 @@
                 <tr>
                     <th>Campo</th>
                     <th>Valor</th>
-                    <!--<th>Total de votos</th>
-                    <th>Porcentaje de votos</th>-->
-                    <!-- Add more table headers as needed -->
                 </tr>
             </thead>
             <tbody>
@@ -202,10 +244,16 @@
 
         <!--Declaring the tabs-->
         <div class="tabs">
-            <button class="tablinks" data-tab="tab1">Edu. Básica</button>
-            <button class="tablinks" data-tab="tab2">Edu. Superior</button>
-            <button class="tablinks" data-tab="tab3">Etnia</button>
-            <button class="tablinks" data-tab="tab4">Alfabetización</button>
+            <button class="tablinks" data-tab="tab1">Sexo</button>
+            <button class="tablinks" data-tab="tab2">Edades</button>
+            <button class="tablinks" data-tab="tab3">Alfabetización</button>
+            <button class="tablinks" data-tab="tab4">Edu. Básica</button>
+            <button class="tablinks" data-tab="tab5">Edu. Superior</button>
+            <button class="tablinks" data-tab="tab6">Etnia</button>
+            <button class="tablinks" data-tab="tab7">Estado Civ.</button>
+            <button class="tablinks" data-tab="tab8">Tipo de Hogar</button>
+            <button class="tablinks" data-tab="tab9">Serv. Públicos</button>
+            <button class="tablinks" data-tab="tab10">Sanidad</button>
         </div>
 
         <!--Defining tab content-->
@@ -223,7 +271,40 @@
 
         <div id="tab4" class="tabcontent">
             <canvas id="charttab4"></canvas>
-        </div>      
+        </div>
+
+        <div id="tab5" class="tabcontent">
+            <canvas id="charttab5"></canvas>
+        </div> 
+
+        <div id="tab6" class="tabcontent">
+            <canvas id="charttab6"></canvas>
+        </div> 
+
+        <div id="tab7" class="tabcontent">
+            <canvas id="charttab7"></canvas>
+        </div> 
+
+        <div id="tab8" class="tabcontent">
+            <canvas id="charttab8"></canvas>
+        </div> 
+
+        <div id="tab9" class="tabcontent">
+            <canvas id="charttab9"></canvas>
+        </div> 
+
+        <div id="tab10" class="tabcontent">
+            <canvas id="charttab10"></canvas>
+        </div>       
+    </div>
+
+    <div id="menu3" class="menu3">
+        <h2>Variables más determinantes:</h2>
+        <canvas id="chartSHAP"></canvas>
+    </div>
+
+    <div id="popup-container" class="popup-container">
+        <button id="popup">Generar sugerencia</button>
     </div>
 
     <!-- JavaScript/jQuery Script -->
@@ -231,15 +312,190 @@
         $(document).ready(function() {
             var menu1 = $('#menu1');
             var menu2 = $('#menu2');
+            var menu3 = $('#menu3');
             var map1 = $('#map1');
             var map2 = $('#map2');
             var map3 = $('#map3');
+            var popup = $('#popup-container');
 
             var activeTab = "tab1";
             var data_dpto;
             var polygonID;
 
             console.log("mapa y datos cargados")
+
+            function showPopUp() {
+                var dpto = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
+                if (dpto) {
+
+                    var shapValues = [];
+                    var shapLabels = [];
+
+                    // Filter columns ending with "_SHAP"
+                    Object.keys(dpto).forEach(function (key) {
+                        if (key.endsWith('_SHAP')) {
+                            shapLabels.push(key);
+                            shapValues.push(dpto[key]);
+                        }
+                    });
+
+                    // Sort the values in descending order
+                    var sortedShapValues = shapValues.slice().sort((a, b) => Math.abs(b) - Math.abs(a));
+
+                    // Take the top 5 values and their corresponding labels
+                    var top10ShapValues = sortedShapValues.slice(0, 10);
+                    var top10ShapLabels = shapLabels.filter(label => top10ShapValues.includes(dpto[label]));
+
+                    // Customize the pop-up text based on chart variables
+                    var dptoNom = "Departamento: " + dpto.DPTO_CNMBR + "\n";
+                    var popUpText = "\nPara un mayor impacto, se recomiendan políticas orientadas hacia: \n- ";
+                    
+                    var shapPrefixes = [];
+                    top10ShapLabels.forEach(function (label) {
+                        var prefix = label.split("_")[0];
+                        if (!shapPrefixes.includes(prefix)) {
+                            shapPrefixes.push(prefix);
+                        }
+                    });
+
+                    var recommended = shapPrefixes.map(function (prefix) {
+                        switch (prefix) {
+                            case "ET":
+                                var labelET = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueET = labelET.split("_")[1];
+                                if (valueET == "NOETNIA") {
+                                    return "Personas no identificadas con ninguna etnicidad"
+                                }
+                                else if (valueET == "SININF") {
+                                    return "Personas que no reporta etnicidad"
+                                }
+                                else {
+                                    return "Identificados como " + valueET;
+                                }
+                                
+
+                            case "EDAD":
+                                var labelEDAD = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueEDAD = labelEDAD.split("_")[1];
+                                if (valueEDAD == 19){
+                                    return "Edades de 19 años o menos";
+                                }
+                                else if (valueEDAD == 60){
+                                    return "Edades de 60 años o más";
+                                }
+                                else {
+                                    return "Edades entre " + valueEDAD + " años"
+                                }
+
+                            case "ED":
+                                var labelED = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueED = labelED.split("_")[1];
+                                var stateED = labelED.split("_")[2];
+                                if (valueED == "Ninguno") {
+                                    return "Sin educación completa";
+                                }
+                                else if (valueED == "SININF"){
+                                    return "Población que no reporta educación";
+                                }
+                                else if (stateED == "Norm"){
+                                    return + valueED + " completo";
+                                }
+                                else{
+                                    return "Educación " + valueED + " " + stateED;
+                                }
+                                
+
+                            case "SX":
+                                var labelSX = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueSX = labelSX.split("_")[1];
+                                if (valueSX == "Hombre") {
+                                    return "Hombres";
+                                }
+                                else {
+                                    return "Mujeres";
+                                }
+
+                            case "EST":
+                                var labelEST = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueEST = labelEST.split("_")[1];
+                                if (valueEST == "SININF") {
+                                    return "Población que no reporta estado civil";
+                                }
+                                else if (valueEST == "Separado") {
+                                    return "Estado civil: Separado/a de unión libre";
+                                }
+                                else if (valueEST == "Union") {
+                                    return "Estado civil: En unión libre";
+                                }
+                                else{
+                                    return "Estado civil: " + valueEST + "/a";
+                                }
+
+                            case "ALF":
+                                var labelALF = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueALF = labelALF.split("_")[1];
+                                if (valueALF == "No"){
+                                    return "Población que no sabe leer";
+                                }
+                                else if (valueALF == "SININF"){
+                                    return "Población que no reporta alfabetización";
+                                }
+                                
+                            case "SAN":
+                                var labelSAN = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueSAN = labelSAN.split("_")[1];
+                                var stateSAN = labelSAN.split("_")[2];
+                                
+                                if (stateSAN == "alcantarillado"){
+                                    return "Población con inodoro conectado a alcantarillado";
+                                }
+                                else {
+                                    return "Población con inodoro conectado a pozo séptico";
+                                }
+                            
+                            case "SER":
+                                var labelSER = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueSER = labelSER.split("_")[1];
+                                var stateSER = labelSER.split("_")[2];
+                                if (valueSER == "Alcantarillado") {
+                                    return "Población con servicio de alcantarillado";
+                                }
+                                else if (stateSER == "No") {
+                                    return "Población sin servicio de internet";
+                                }
+                                else {
+                                    return "Población que no reporta servicio de internet";
+                                }
+
+                            case "TH":
+                                var labelTH = top10ShapLabels.find(label => label.startsWith(prefix+"_"));
+                                var valueTH = labelTH.split("_")[1];
+                                var stateTH = labelTH.split("_")[3];
+                                if (stateTH == "consolidacion") {
+                                    return "Hogares en etapa de consolidación";
+                                }
+                                else if (stateTH == "expansion") {
+                                    return "Hogares en etapa de expansión";
+                                }
+                                else if (stateTH == "salida") {
+                                    return "Hogares en etapa de salida";
+                                }
+                                else if (stateTH == "Norm") {
+                                    return "Hogares en etapa inicial";
+                                }
+                                else {
+                                    return "Parejas mayores sin hijos";
+                                }
+                            
+                            default:
+                                return ""; 
+                        }
+                    });
+
+                    // Display the pop-up
+                    alert(dptoNom + popUpText + recommended.join("\n- "));
+                }
+            }
 
             // Function to open a clicked tab 
             function openTab(evt, tabName){
@@ -252,12 +508,75 @@
                 }
 
                 document.getElementById(tabName).style.display = "block";
-                updateChartData(tabName)
+                updateChartData(tabName);
 
                 $('.tablinks').removeClass('active-tab');
                 // Add the 'active-tab' class to the current tablink
                 $(this).addClass('active-tab');
             }
+
+            function updateDataShap(department) {
+
+                var shapValues = [];
+                var shapLabels = [];
+
+                // Filter columns ending with "_SHAP"
+                Object.keys(department).forEach(function (key) {
+                    if (key.endsWith('_SHAP')) {
+                        shapLabels.push(key);
+                        shapValues.push(department[key]);
+                    }
+                });
+
+                // Sort the values in descending order
+                var sortedShapValues = shapValues.slice().sort((a, b) => Math.abs(b) - Math.abs(a));
+
+                // Take the top 5 values and their corresponding labels
+                var top10ShapValues = sortedShapValues.slice(0, 10);
+                var top10ShapLabels = shapLabels.filter(label => top10ShapValues.includes(department[label]));
+
+                var backgroundColors = top10ShapValues.map(value => value < 0 ? 'rgba(200, 105, 105, 1)' : 'rgba(122, 156, 200, 1)');
+
+                var shapData = {
+                    labels: top10ShapLabels,
+                    datasets: [{
+                        label: "",
+                        data: top10ShapValues,
+                        backgroundColor: backgroundColors,
+                        borderColor: 'rgba(95, 95, 95, 1)',
+                        borderWidth: 2,
+                    }],
+                };
+
+                var chartSHAPElement = document.getElementById('chartSHAP').getContext('2d');
+
+                if (chartSHAPElement) {
+                    if (window.myChartSHAP) {
+                        window.myChartSHAP.destroy();
+                        console.log('Old SHAP chart destroyed');
+                    }
+
+                    window.myChartSHAP = new Chart(chartSHAPElement, {
+                        type: 'bar',
+                        data: shapData,
+                        options: {
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                },
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false,
+                                },
+                            },                            
+                        },
+                    });
+                    console.log('New SHAP chart created');
+                }
+            };
+
 
             function updateChartData(tabName){
                 var dpto = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
@@ -270,13 +589,65 @@
                         datasets: [{
                             label: "",
                             data: [],
-                            backgroundColor: "rgba(0,123,134,0.5)",
+                            backgroundColor: "rgba(255,194,105,0.5)",
                             borderColor: "rgba(0,123,134,1)",
                             borderWidth: 2,
                         }]
                     };
 
                     if(tabName == "tab1") {
+                        chartData.labels = [
+                            "Masculino",
+                            "Femenino",
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "%",
+                                data: [
+                                    dpto.SX_Hombre_Norm * 100,
+                                    dpto.SX_Mujer_Norm * 100,
+                                ],
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+                    else if(tabName == "tab2") {
+                        chartData.labels = [
+                            "<19",
+                            "20-24",
+                            "25-29",
+                            "30-34",
+                            "35-39",
+                            "40-44",
+                            "45-49",
+                            "50-54",
+                            "55-59",
+                            ">60"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "% Completo",
+                                data: [
+                                    dpto.EDAD_19_o_menor * 100,
+                                    dpto.EDAD_20_24_Norm * 100,
+                                    dpto.EDAD_25_29_Norm * 100,
+                                    dpto.EDAD_30_34_Norm * 100,
+                                    dpto.EDAD_35_39_Norm * 100,
+                                    dpto.EDAD_40_44_Norm * 100,
+                                    dpto.EDAD_45_49_Norm * 100,
+                                    dpto.EDAD_50_54_Norm * 100,
+                                    dpto.EDAD_55_59_Norm * 100,
+                                    dpto.EDAD_60_o_mas * 100
+                                ],
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+                    else if(tabName == "tab4") {
                         chartData.labels = [
                             "Preescolar",
                             "Primaria",
@@ -293,11 +664,11 @@
                                     dpto.ED_Primaria_Completa_Norm * 100,
                                     dpto.ED_Secundaria_Completa_Norm * 100,
                                     dpto.ED_Media_Completa_Norm * 100,
-                                    dpto.ED_Normal_Completa_Norm * 100,
+                                    dpto.ED_Ordinaria_Completa_Norm * 100,
                                     0
                                 ],
-                                backgroundColor: "rgba(75,192,192,0.5)",
-                                borderColor: "rgba(75,192,192,1)",
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
                                 borderWidth: 2,
                             },
                             {
@@ -307,7 +678,7 @@
                                     dpto.ED_Primaria_Incompleta_Norm * 100,
                                     dpto.ED_Secundaria_Incompleta_Norm * 100,
                                     dpto.ED_Media_Incompleta_Norm * 100,
-                                    dpto.ED_Normal_Incompleta_Norm * 100,
+                                    dpto.ED_Ordinaria_Incompleta_Norm * 100,
                                     dpto.ED_SININF_Norm * 100
                                 ],
                                 backgroundColor: "rgba(255,99,132,0.5)",
@@ -316,7 +687,7 @@
                             },
                         ];
                     }
-                    else if(tabName == "tab2") {
+                    else if(tabName == "tab5") {
                         chartData.labels = [
                             "Técnico",
                             "Tecnológico",
@@ -332,13 +703,13 @@
                                     dpto.ED_Universitario_Norm * 100,
                                     dpto.ED_Postgrado_Norm * 100,
                                 ],
-                                backgroundColor: "rgba(75,192,192,0.5)",
-                                borderColor: "rgba(75,192,192,1)",
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
                                 borderWidth: 2,
                             },
                         ];
                     }
-                    else if(tabName == "tab3") {
+                    else if(tabName == "tab6") {
                         chartData.labels = [
                             "Indígena",
                             "Gitano/a o Rrom",
@@ -360,13 +731,13 @@
                                     dpto.ET_NOETNIA_Norm * 100,
                                     dpto.ET_SININF_Norm * 100,
                                 ],
-                                backgroundColor: "rgba(75,192,192,0.5)",
-                                borderColor: "rgba(75,192,192,1)",
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
                                 borderWidth: 2,
                             },
                         ];
                     }
-                    else if(tabName == "tab4") {
+                    else if(tabName == "tab3") {
                         chartData.labels = [
                             "Sabe leer",
                             "No sabe leer",
@@ -380,8 +751,137 @@
                                     dpto.ALF_No_Sabe_Leer_Norm * 100,
                                     dpto.ALF_SININF_Norm * 100
                                 ],
-                                backgroundColor: "rgba(75,192,192,0.5)",
-                                borderColor: "rgba(75,192,192,1)",
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+
+                    else if(tabName == "tab7") {
+                        chartData.labels = [
+                            "Soltero/a",
+                            "Casado/a",
+                            "Unión Libre",
+                            "Divorciado/a",
+                            "Separado/a (Matr.)",
+                            "Separado/a (U.L.)",
+                            "Viudo/a",
+                            "Sin información"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "% Reportado",
+                                data: [
+                                    dpto.EST_Soltero_Norm * 100,
+                                    dpto.EST_Casado_Norm * 100,
+                                    dpto.EST_Union_libre_Norm *100,
+                                    dpto.EST_Divorciado_Norm * 100,
+                                    dpto.EST_Separado_de_matrimonio_Norm * 100,
+                                    dpto.EST_Separado_de_union_libre_Norm *100,
+                                    dpto.EST_Viudo_Norm *100,
+                                    dpto.EST_SININF_Norm * 100
+                                ],
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+
+                    else if(tabName == "tab8") {
+                        chartData.labels = [
+                            "Pareja joven sin hijos",
+                            "Pareja mayor sin hijos",
+                            "Etapa inicial",
+                            "Et. expansión",
+                            "Et. consolidación",
+                            "Etapa de salida"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "%",
+                                data: [
+                                    dpto.TH_Pareja_joven_sin_hijos_Norm * 100,
+                                    dpto.TH_Pareja_mayor_sin_hijos_Norm *100,
+                                    dpto.TH_Etapa_inicial_Norm * 100,
+                                    dpto.TH_Etapa_de_expansion__Norm *100,
+                                    dpto.TH_Etapa_de_consolidacion__Norm * 100,
+                                    dpto.TH_Etapa_de_salida__Norm * 100
+                                ],
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+
+                    else if(tabName == "tab9") {
+                        chartData.labels = [
+                            "En. Eléctrica",
+                            "Acueducto",
+                            "Alcantarillado",
+                            "Gas Natural",
+                            "Basuras",
+                            "Internet"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "Sí",
+                                data: [
+                                    dpto.SER_Energia_electrica_Si_Norm * 100,
+                                    dpto.SER_Acueducto_Si_Norm * 100,
+                                    dpto.SER_Alcantarillado_Si_Norm * 100,
+                                    dpto.SER_Gas_natural_Si_Norm * 100,
+                                    dpto.SER_Basuras_Si_Norm * 100,
+                                    dpto.SER_Internet_Si_Norm,
+                                ],
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
+                                borderWidth: 2,
+                            },
+                            {
+                                label: "No",
+                                data: [
+                                    0,
+                                    dpto.SER_Energia_electrica_No_Norm * 100,
+                                    dpto.SER_Acueducto_No_Norm * 100,
+                                    dpto.SER_Alcantarillado_No_Norm * 100,
+                                    dpto.SER_Gas_natural_No_Norm * 100,
+                                    dpto.SER_Basuras_No_Norm * 100,
+                                    dpto.SER_Internet_No_Norm
+                                ],
+                                backgroundColor: "rgba(255,99,132,0.5)",
+                                borderColor: "rgba(255,99,132,1)",
+                                borderWidth: 2,
+                            },
+                        ];
+                    }
+
+                    else if(tabName == "tab10") {
+                        chartData.labels = [
+                            "Inodoro - Alcant.",
+                            "Inodoro - Pozo sép.",
+                            "Inodoro - Sin conex.",
+                            "Inodoro - Fte. de agua",
+                            "Letrina",
+                            "Sin serv. sanit.",
+                            "Sin información"
+                        ];
+                        chartData.datasets = [
+                            {
+                                label: "%",
+                                data: [
+                                    dpto.SAN_Inodoro_alcantarillado_Norm * 100,
+                                    dpto.SAN_Inodoro_Pozo_Norm *100,
+                                    dpto.SAN_Inodoro_SC_Norm * 100,
+                                    dpto.SAN_Inodoro_Fuente_Norm * 100,
+                                    dpto.SAN_Letrina_Norm *100,
+                                    dpto.SAN_Sin_servicio_sanitario_Norm * 100,
+                                    dpto.SAN_SININF_Norm * 100
+                                ],
+                                backgroundColor: "rgba(255,194,105,0.8)",
+                                borderColor: "rgba(255,194,105,1)",
                                 borderWidth: 2,
                             },
                         ];
@@ -440,14 +940,26 @@
                     // Show the menus to the right of map1
                     menu1.css({
                         'display': 'block',                
-                        'top': 150 + 'px',
-                        'left': 800 + 'px'
+                        'top': 570 + 'px',
+                        'left': 750 + 'px'
                     });
 
                     menu2.css({
                         'display': 'block',                
-                        'top': 550 + 'px',
-                        'left': 800 + 'px' // Adjust as needed
+                        'top': 120 + 'px',
+                        'left': 750 + 'px' // Adjust as needed
+                    });
+
+                    menu3.css({
+                        'display': 'block',                
+                        'top': 570 + 'px',
+                        'left': 1150 + 'px' // Adjust as needed
+                    });
+
+                    popup.css({
+                        'display': 'block',                
+                        'top': 50 + 'px',
+                        'left': 1200 + 'px' // Adjust as needed
                     });
 
                     console.log(e)
@@ -459,7 +971,7 @@
                     var department = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
 
                     if(department){
-                    
+                        updateDataShap(department);
                         var tbody1 = menu1.find('tbody');
 
                         tbody1.empty();
@@ -471,32 +983,27 @@
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Población:      "))
-                            .append($('<td>').text(department.STP27_PERS))
+                            .append($('<td>').text(department.STP27_PERS.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Total de votos:     "))
-                            .append($('<td>').text(department.Total_votos))
+                            .append($('<td>').text(department.Total_votos.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos en blanco:     "))
-                            .append($('<td>').text(department.votos_en_blanco))
-                        );
-
-                        tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos no marcados:     "))
-                            .append($('<td>').text(department.votos_no_marcados))
-                        );
-
-                        tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos nulos:     "))
-                            .append($('<td>').text(department.votos_nulos))
+                            .append($('<td>').text("Total de votos no válidos (en blanco, nulos, no marcados):     "))
+                            .append($('<td>').text(department.Total_votos_No_Validos.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Partido ganador:     "))
                             .append($('<td>').text(department.Partido_1))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Porcentaje de votos:     "))
+                            .append($('<td>').text(Math.round(department.Partido_1_Porc*10000)/100))
                         );
                     };
                 });
@@ -507,14 +1014,20 @@
                 
                     menu1.css({
                         'display': 'block',                
-                        'top': 150 + 'px',
-                        'left': 800 + 'px'
+                        'top': 570 + 'px',
+                        'left': 750 + 'px'
                     });
 
                     menu2.css({
                         'display': 'block',                
-                        'top': 550 + 'px',
-                        'left': 800 + 'px' // Adjust as needed
+                        'top': 120 + 'px',
+                        'left': 750 + 'px' // Adjust as needed
+                    });
+
+                    menu3.css({
+                        'display': 'block',                
+                        'top': 570 + 'px',
+                        'left': 1150 + 'px' // Adjust as needed
                     });
 
                     polygonID = e.target._leaflet_id;
@@ -526,7 +1039,7 @@
                     var department = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
 
                     if(department){
-                    
+                        updateDataShap(department)
                         var tbody1 = menu1.find('tbody');
 
                         tbody1.empty();
@@ -538,32 +1051,27 @@
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Población:      "))
-                            .append($('<td>').text(department.STP27_PERS))
+                            .append($('<td>').text(department.STP27_PERS.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Total de votos:     "))
-                            .append($('<td>').text(department.Total_votos))
+                            .append($('<td>').text(department.Total_votos.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos en blanco:     "))
-                            .append($('<td>').text(department.votos_en_blanco))
-                        );
-
-                        tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos no marcados:     "))
-                            .append($('<td>').text(department.votos_no_marcados))
-                        );
-
-                        tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos nulos:     "))
-                            .append($('<td>').text(department.votos_nulos))
+                            .append($('<td>').text("Total de votos no válidos (en blanco, nulos, no marcados):     "))
+                            .append($('<td>').text(department.Total_votos_No_Validos.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Partido ganador:     "))
                             .append($('<td>').text(department.Partido_1))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Porcentaje de votos:     "))
+                            .append($('<td>').text(Math.round(department.Partido_1_Porc*10000)/100))
                         );
                     };
                 });
@@ -576,14 +1084,20 @@
                 
                     menu1.css({
                         'display': 'block',                
-                        'top': 150 + 'px',
-                        'left': 800 + 'px' // Adjust as needed
+                        'top': 570 + 'px',
+                        'left': 750 + 'px'
                     });
 
                     menu2.css({
                         'display': 'block',                
-                        'top': 550 + 'px',
-                        'left': 800 + 'px' // Adjust as needed
+                        'top': 120 + 'px',
+                        'left': 750 + 'px' // Adjust as needed
+                    });
+
+                    menu3.css({
+                        'display': 'block',                
+                        'top': 570 + 'px',
+                        'left': 1150 + 'px' // Adjust as needed
                     });
 
                     polygonID = e.target._leaflet_id;
@@ -595,7 +1109,7 @@
                     var department = data_dpto.find(item => item.DPTO_CCDGO_NEW === polygonID);
 
                     if(department){
-                    
+                        updateDataShap(department)
                         var tbody1 = menu1.find('tbody');
 
                         tbody1.empty();
@@ -607,32 +1121,27 @@
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Población:      "))
-                            .append($('<td>').text(department.STP27_PERS))
+                            .append($('<td>').text(department.STP27_PERS.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Total de votos:     "))
-                            .append($('<td>').text(department.Total_votos))
+                            .append($('<td>').text(department.Total_votos.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos en blanco:     "))
-                            .append($('<td>').text(department.votos_en_blanco))
-                        );
-
-                        tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos no marcados:     "))
-                            .append($('<td>').text(department.votos_no_marcados))
-                        );
-
-                        tbody1.append($('<tr>')
-                            .append($('<td>').text("Total de votos nulos:     "))
-                            .append($('<td>').text(department.votos_nulos))
+                            .append($('<td>').text("Total de votos no válidos (en blanco, nulos, no marcados):"))
+                            .append($('<td>').text(department.Total_votos_No_Validos.toLocaleString()))
                         );
 
                         tbody1.append($('<tr>')
                             .append($('<td>').text("Partido ganador:     "))
                             .append($('<td>').text(department.Partido_1))
+                        );
+
+                        tbody1.append($('<tr>')
+                            .append($('<td>').text("Porcentaje de votos:     "))
+                            .append($('<td>').text(Math.round(department.Partido_1_Porc*10000)/100))
                         );
                     };
                 });
@@ -647,6 +1156,9 @@
                 // Add the 'active-tab' class to the current tablink
                 $(this).addClass('active-tab');
             });
+
+            $('#popup').on('click', showPopUp);
+
         });
     </script>
 </body>

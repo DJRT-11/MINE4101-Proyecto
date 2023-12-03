@@ -16,8 +16,10 @@ data_geo = gpd.read_file("data/Departamentos.json")
 data_geo = data_geo.drop(columns="id")
 data_geo.index=map(lambda p : str(p),data_geo.index)
 data_geo.crs = 'EPSG:4326'
+print(data_geo.columns)
 
-data_dem = pd.read_csv("data/DPTO_INFORMATION_SD_VO.csv")
+data_dem = pd.read_csv("data/DPTO_INFORMATION_SD_VO.csv",encoding='utf-8')
+data_shap = pd.read_csv("data/DPTO_SHAP.csv")
 
 style_function = lambda x: {'fillColor': '#F27F0C', 
                             'color':'#F27F0C', 
@@ -54,8 +56,11 @@ def dptos_map():
     dept_map.options['scrollWheelZoom'] = False
     dept_map.options['dragging'] = False
 
+    threshold_scale = [-0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6]
+
     choro = Choropleth(geo_data=data_geo.geometry.__geo_interface__,
-            data=data_geo.STP27_PERS,
+            data=data_geo.Diff,
+            threshold_scale=threshold_scale,
             key_on="feature.id", fill_color="RdBu")
     
     #choro.color_scale.width=0
@@ -95,7 +100,7 @@ def sandr_map():
     sa_map.options['dragging'] = False
 
     choro = Choropleth(geo_data=data_geo.geometry.__geo_interface__,
-            data=data_geo.STP27_PERS,
+            data=data_dem.Diff,
             key_on="feature.id", fill_color="RdBu")
 
     choro.color_scale.width=0
@@ -141,7 +146,7 @@ def provd_map():
     prov_map.options['dragging'] = False
 
     choro = Choropleth(geo_data=data_geo.geometry.__geo_interface__,
-            data=data_geo.STP27_PERS,
+            data=data_geo.Diff,
             key_on="feature.id", fill_color="RdBu")
     
     choro.color_scale.width=0
@@ -183,6 +188,10 @@ def dpto_data_map():
 
     data_dem["DPTO_CCDGO"] = data_dem["DPTO_CCDGO"].astype('int')
     data_cod = pd.merge(data_cod,data_dem,on="DPTO_CCDGO")
+
+    data_shap["DPTO_CCDGO"] = data_shap["DPTO_CCDGO"].astype('int')
+    data_cod = pd.merge(data_cod,data_shap,on="DPTO_CCDGO")
+
     data_cod_json = data_cod.to_dict(orient="records")
 
     return json.dumps({"data_dpto": data_cod_json})
